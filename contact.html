@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Contact Venture Verse 2026 faculty leadership and student coordinators." />
+  <title>Contact Us | Venture Verse 2026</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+</head>
+<body class="contact-page">
+  <div class="global-logo-backdrop" aria-hidden="true">
+    <div class="global-logo-mark">
+      <span class="global-logo-ring global-logo-ring-outer"></span>
+      <span class="global-logo-ring global-logo-ring-inner"></span>
+      <img src="assets/images/vv_logo.jpg" alt="" class="global-logo-image" />
+    </div>
+  </div>
+
+  <nav class="navbar" id="navbar" aria-label="Main navigation">
+    <a href="index_1_1.html#home" class="nav-brand">VENTURE <span class="nav-brand-spark" aria-hidden="true">⚡</span> VERSE</a>
+    <div class="nav-links" id="navLinks">
+      <button class="mobile-nav-close" id="mobileNavClose" type="button" aria-label="Close navigation">×</button>
+      <a href="index_1_1.html#home">Home</a>
+      <a href="index_1_1.html#about">About Us</a>
+      <a href="index_1_1.html#events">Events</a>
+      <a href="index_1_1.html#roadmap">Schedule</a>
+      <a href="index_1_1.html#glimpses">Glimpses</a>
+      <a href="contact.html" class="active" aria-current="page">Contact</a>
+      <a href="https://forms.gle/gLbbJ6NcJmQjCRit7" class="nav-register" target="_blank" rel="noopener noreferrer">Register Now <span class="nav-register-arrow" aria-hidden="true">→</span></a>
+    </div>
+    <button class="nav-hamburger" id="hamburger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="contact-pattern" aria-hidden="true"></div>
+  <main class="contact-page-main" id="contact">
+    <div class="contact-page-container">
+      <header class="contact-page-heading">
+        <p class="section-eyebrow">Venture Verse 2026</p>
+        <h1>CONTACT US</h1>
+        <p>Connect with our faculty leadership and student organizing committee.</p>
+      </header>
+
+      <div class="contact-layout">
+        <aside class="contact-sidebar" aria-label="Contact teams">
+          <h2>TEAMS &amp; SECTIONS</h2>
+          <div class="contact-tabs" role="tablist" aria-label="Coordinator categories">
+            <button class="contact-tab is-active" id="faculty-tab" type="button" role="tab" aria-selected="true" aria-controls="faculty-panel" data-contact-tab="faculty">Faculty Leadership</button>
+            <button class="contact-tab" id="students-tab" type="button" role="tab" aria-selected="false" aria-controls="students-panel" data-contact-tab="students" tabindex="-1">Student Coordinators</button>
+          </div>
+          <p class="contact-sidebar-note">The people behind the ideas, planning, and energy of Venture Verse.</p>
+        </aside>
+
+        <div class="contact-content" aria-live="polite">
+          <section class="contact-panel is-active" id="faculty-panel" role="tabpanel" aria-labelledby="faculty-tab" data-contact-panel="faculty">
+            <div class="contact-panel-heading">
+              <span>01 / LEADERSHIP</span>
+              <h2>Faculty Leadership</h2>
+            </div>
+            <div class="contact-card-grid contact-card-grid-faculty" id="facultyProfiles"></div>
+          </section>
+          <section class="contact-panel" id="students-panel" role="tabpanel" aria-labelledby="students-tab" data-contact-panel="students" hidden>
+            <div class="contact-panel-heading">
+              <span>02 / ORGANIZING TEAM</span>
+              <h2>Student Coordinators</h2>
+            </div>
+            <div class="contact-card-grid contact-card-grid-students student-coordinators-grid" id="studentProfiles"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="contact-scroll-indicator" aria-hidden="true"><span id="contactScrollProgress"></span></div>
+  <script src="script.js"></script>
+</body>
+</html>

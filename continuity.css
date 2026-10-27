@@ -1,0 +1,414 @@
+/* ═══════════════════════════════════════════════════════════════════
+   VENTURE VERSE — Visual Continuity Layer
+   Purpose: Eliminate section-to-section visual breaks without
+            changing the existing design identity, colors, or layout.
+   Strategy: Shared ambient glows, gradient bridges, unified rhythm.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ──────────────────────────────────────────────────────────────────
+   1. SHARED SCROLL CANVAS
+   A single fixed layer of very subtle radial nebulae that float behind
+   every section. They drift slowly so scrolling feels like moving
+   through a single atmospheric space rather than separate rooms.
+   ────────────────────────────────────────────────────────────────── */
+body::before {
+  /* Extend the existing fixed overlay with softer, wider nebulae
+     that prevent hard-edge colour pops between sections.           */
+  background:
+    /* top-centre warm halo — bleeds into hero + about */
+    radial-gradient(ellipse 100% 45% at 50% -5%,  rgba(212,175,55,0.055) 0%, transparent 70%),
+    /* left drift — about & roadmap zone */
+    radial-gradient(ellipse 55% 60% at -8% 38%,   rgba(24,76,120,0.18)  0%, transparent 65%),
+    /* right drift — events & glimpses zone */
+    radial-gradient(ellipse 55% 60% at 108% 62%,  rgba(24,76,120,0.18)  0%, transparent 65%),
+    /* centre warmth — always present at mid-page */
+    radial-gradient(ellipse 70% 50% at 50% 52%,   rgba(212,175,55,0.028) 0%, transparent 70%),
+    /* bottom-centre glow bleeds into footer */
+    radial-gradient(ellipse 90% 35% at 50% 105%,  rgba(212,175,55,0.04)  0%, transparent 60%);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   2. HERO → ABOUT BRIDGE
+   The hero fades to #070c18 at its bottom edge. We replace the hard
+   stop with a longer, softer gradient so About appears to float out
+   of the same atmospheric depth.
+   ────────────────────────────────────────────────────────────────── */
+.hero-bg::after {
+  /* Extend the fade further down so it dissolves into transparency
+     instead of stopping at the section boundary.                   */
+  background: linear-gradient(
+    180deg,
+    rgba(4,8,20,0.06) 0%,
+    rgba(4,8,20,0.01) 40%,
+    rgba(7,12,24,0.65) 82%,
+    rgba(7,12,24,0.92) 100%
+  );
+}
+
+/* Soft ambient glow that bleeds down from the hero into About. */
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 240px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   3. ABOUT SECTION — add subtle ambient that continues from hero
+   ────────────────────────────────────────────────────────────────── */
+.about {
+  /* Remove any implicit background stacking that creates a banding
+     effect; let the global body background show through.           */
+  isolation: isolate;
+}
+
+/* Gentle top bridge — pulls down from the hero's warm glow */
+.about::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 200px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Bottom bridge from About → Roadmap */
+.about::after {
+  content: '';
+  position: absolute;
+  bottom: -60px;
+  left: 0;
+  right: 0;
+  height: 160px;
+  background: linear-gradient(180deg, transparent 0%, rgba(10,15,35,0.35) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   4. ROADMAP SECTION — dissolve its hard black box
+   The `.rm-section` has `background: radial-gradient(…#12142b…)`.
+   We soften its top and bottom edges so it blends with neighbours.
+   ────────────────────────────────────────────────────────────────── */
+.rm-section {
+  /* Keep the existing background but extend the section vertically
+     so its gradient can fade naturally at the edges.              */
+  position: relative;
+  /* Replace the hard clip with a mask that fades top + bottom.   */
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0,0,0,0.6) 4%,
+    #000 10%,
+    #000 90%,
+    rgba(0,0,0,0.6) 96%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0,0,0,0.6) 4%,
+    #000 10%,
+    #000 90%,
+    rgba(0,0,0,0.6) 96%,
+    transparent 100%
+  );
+  /* Collapse the top padding so the mask fade-in isn't white-space. */
+  padding-top: 0;
+}
+
+/* Restore the heading top padding inside the now-unpadded section. */
+.rm-head {
+  padding-top: clamp(80px, 13vh, 130px);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   5. ROADMAP → EVENTS BRIDGE
+   After the roadmap's bottom fade, the Events section should feel
+   like a continuation, not a new page.
+   ────────────────────────────────────────────────────────────────── */
+.events {
+  position: relative;
+  isolation: isolate;
+}
+
+.events::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(180deg, rgba(7,8,15,0.55) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle gold ambient below the events grid to warm the section base */
+.events::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 180px;
+  background: radial-gradient(ellipse at 50% 100%, rgba(212,175,55,0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   6. EVENTS → GLIMPSES BRIDGE
+   The events section's card density drops suddenly into the open
+   carousel space. A shared ambient glow maintains continuity.
+   ────────────────────────────────────────────────────────────────── */
+.prev-glimpses {
+  position: relative;
+  isolation: isolate;
+}
+
+.prev-glimpses::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 120px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   7. GLIMPSES → HIGHLIGHTS BRIDGE
+   ────────────────────────────────────────────────────────────────── */
+.highlights {
+  position: relative;
+  isolation: isolate;
+}
+
+.highlights::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(180deg, rgba(7,8,15,0.3) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   8. HIGHLIGHTS → FOOTER BRIDGE
+   Remove the hard border-top; replace with a gradient fade.
+   ────────────────────────────────────────────────────────────────── */
+.footer {
+  border-top: none; /* remove the hard 1px line */
+  position: relative;
+}
+
+/* Soft gradient replaces the line */
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(212,175,55,0.15) 20%,
+    rgba(212,175,55,0.32) 50%,
+    rgba(212,175,55,0.15) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Warm atmospheric glow rising from the footer's mega-text. */
+.footer::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(0deg, rgba(212,175,55,0.06) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   9. CROSS-SECTION VERTICAL RHYTHM
+   Normalise section padding so the scroll feels evenly paced.
+   ────────────────────────────────────────────────────────────────── */
+:root {
+  /* Tighten the maximum so sections don't feel like isolated islands */
+  --section-pad: clamp(64px, 7.5vw, 108px);
+}
+
+/* The roadmap head padding is set inline; the above .rm-head rule
+   already corrects it. Nothing else needed.                        */
+
+/* ──────────────────────────────────────────────────────────────────
+   10. SECTION SEPARATOR LINES → remove and replace
+   The existing about / highlights sections have no hard lines, but
+   the events grid creates visual edges at card boundaries. Keep the
+   glass-card borders, but reduce their outer-section "wall" feel.
+   ────────────────────────────────────────────────────────────────── */
+.events-grid {
+  /* Very subtle bottom glow so the grid doesn't just stop */
+  padding-bottom: 12px;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   11. SPONSOR CARDS — soften the white-on-dark contrast
+   White sponsor cards on the dark page look pasted-in. Soften edges.
+   ────────────────────────────────────────────────────────────────── */
+.sponsor-card {
+  /* Preserve existing white bg but add a very subtle warm tint and
+     a stronger shadow to visually anchor them to the dark theme.  */
+  background: rgba(252,249,240,0.97);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.42),
+    0 0 0 1px rgba(212,175,55,0.22),
+    0 0 24px rgba(212,175,55,0.1);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   12. SCROLL-LINKED GOLD THREAD
+   A fixed vertical hairline on the page's left edge subtly pulses,
+   giving the sense that the content flows along a single axis.
+   Very unobtrusive — 1px wide, only partially visible.
+   ────────────────────────────────────────────────────────────────── */
+body::after {
+  /* Preserve the dot-grid from the original but also overlay the
+     gold thread using a second pseudo-element via a new element
+     added by JS (see continuity.js).                             */
+  /* No change needed here — the existing dot-grid is good.      */
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   13. REVEAL ANIMATION — make reveals feel like unfolding, not popping
+   ────────────────────────────────────────────────────────────────── */
+.reveal {
+  /* Slow the Y travel slightly for a more cinematic feel */
+  transition:
+    opacity   0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Reduce starting offset so elements emerge gently */
+  transform: translateY(28px);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger siblings inside a revealed container */
+.reveal.revealed > *:nth-child(1) { transition-delay: 0ms; }
+.reveal.revealed > *:nth-child(2) { transition-delay: 55ms; }
+.reveal.revealed > *:nth-child(3) { transition-delay: 110ms; }
+.reveal.revealed > *:nth-child(4) { transition-delay: 165ms; }
+
+/* ──────────────────────────────────────────────────────────────────
+   14. SECTION HEADING CONTINUITY
+   Give every section eyebrow a consistent left-right separator line
+   to unify the typography rhythm.
+   ────────────────────────────────────────────────────────────────── */
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-eyebrow::before,
+.section-eyebrow::after {
+  content: '';
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+  opacity: 0.6;
+}
+
+.section-eyebrow::after {
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   15. MOBILE CONTINUITY ADJUSTMENTS
+   ────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Tighter mask on mobile so the roadmap doesn't swallow too much
+     vertical space.                                               */
+  .rm-section {
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(0,0,0,0.8) 3%,
+      #000 8%,
+      #000 92%,
+      rgba(0,0,0,0.8) 97%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(0,0,0,0.8) 3%,
+      #000 8%,
+      #000 92%,
+      rgba(0,0,0,0.8) 97%,
+      transparent 100%
+    );
+  }
+
+  .hero::after,
+  .about::before,
+  .about::after,
+  .events::before,
+  .events::after {
+    opacity: 0.6; /* reduce on mobile to avoid banding on OLED screens */
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   16. REDUCED MOTION — strip all transition overrides
+   ────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero::after,
+  .about::before,
+  .about::after,
+  .events::before,
+  .events::after,
+  .prev-glimpses::before,
+  .highlights::before,
+  .footer::before,
+  .footer::after {
+    display: none;
+  }
+
+  .rm-section {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .reveal {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
