@@ -3401,3 +3401,31 @@ h4,
     max-width: calc(100vw - 24px);
   }
 }
+
+.event-roadmap-date {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  font-size: 0.85rem;
+  color: rgba(212, 175, 55, 0.85);
+  -webkit-text-fill-color: rgba(212, 175, 55, 0.85);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.rm-word.r .event-roadmap-date {
+  left: auto;
+  right: 0;
+}
+
+.card-event-date {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #d4af37;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 6px 0 10px;
+  opacity: 0.9;
+}
