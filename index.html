@@ -84,14 +84,14 @@
     <div class="container">
       <div class="reveal about-heading">
         <p class="section-eyebrow">Who We Are</p>
-        <h2 class="section-title cinematic-pop-heading">About The Event</h2>
       </div>
 
       <div class="about-institution-grid reveal">
         <article class="about-card about-copy-panel">
           <p class="about-kicker">The Institution</p>
           <h3>ABOUT ORIENTAL GROUP OF INSTITUTES</h3>
-          <p>Founded with a vision to impart world-class technical and professional education, Oriental Group of Institutes (OGI), Bhopal stands as a premier educational conglomerate known for academic excellence, innovation, and industry leadership in Central India.</p>
+          <img class="about-institution-image" src="assets/images/oriental-group-campus.jpeg" alt="Oriental Group of Institutes campus in Bhopal">
+          <p>Oriental Group of Institutes was started by the founder Chairman Dr. KL Thakral in the year 1995. It is a self financed premier educational group imparting quality education in the disciplines of Engineering, Pharmacy, Management and Advanced Computer Studies. At present Oriental has Colleges at Bhopal, Indore &amp; Jabalpur and the Group has a significant presence in the Central region. A private University (Oriental University) is functioning with all its disciplines at Indore. Oriental Group is a Self financed Organisation running under the Devi Shakuntala Thakral Charitable Foundation, Bhopal</p>
           
         </article>
       </div>
@@ -136,6 +136,7 @@
     .rm-word.r{text-align:right;transform:translate3d(calc(var(--x,0px) - 100%),calc(var(--y,0px) - 50%),0) scale(var(--s,.9));transform-origin:100% 50%}
     .rm-rocket{position:absolute;top:0;left:0;width:40px;height:54px;margin:-27px 0 0 -20px;z-index:3;pointer-events:none;will-change:transform,opacity;
       filter:drop-shadow(0 0 10px rgba(255,170,60,.55))}
+    #burstCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:25}
     .rm-rocket svg{display:block;width:100%;height:100%;overflow:visible}
     .rm-flame{transform-origin:24px 48px;animation:rmFlame .18s ease-in-out infinite alternate}
     @keyframes rmFlame{from{transform:scaleY(.8)}to{transform:scaleY(1.25)}}
@@ -162,7 +163,8 @@
       <h3 class="rm-word">MUDRA</h3>
       <h3 class="rm-word">KARVAAN</h3>
       <h3 class="rm-word">UNIFEST</h3>
-      <div class="rm-rocket" id="rmRocket" aria-hidden="true">
+      <canvas id="burstCanvas" aria-hidden="true"></canvas>
+      <div class="rm-rocket timeline-rocket" id="rmRocket" aria-hidden="true">
         <svg viewBox="0 0 48 64">
           <path class="rm-flame" d="M19 48 Q24 72 29 48Z" fill="#ff9d2e" />
           <path d="M15 34 L5 52 L16 47Z M33 34 L43 52 L32 47Z" fill="#f2c14e" />
@@ -804,6 +806,16 @@
         ' S' + (cx - amp * 0.3) + ' ' + f(0.9) + ' ' + cx + ' ' + f(0.96);
       base.setAttribute('d', d); trail.setAttribute('d', d);
       L = base.getTotalLength();
+      /* Keep the dotted guide only as far as the rocket's landing point. */
+      var trackEnd = L * STOP_PROGRESS;
+      var trackDotCount = Math.ceil(trackEnd / 13);
+      var trackDashes = [];
+      for (var dot = 0; dot < trackDotCount; dot++) {
+        var dashLength = dot === trackDotCount - 1 ? Math.min(3, trackEnd - dot * 13) : 3;
+        trackDashes.push(dashLength);
+        trackDashes.push(dot === trackDotCount - 1 ? Math.max(0, L - (dot * 13 + dashLength)) : 10);
+      }
+      base.style.strokeDasharray = trackDashes.join(' ');
       trail.style.strokeDasharray = L;
       S = [];
       for (var i = 0; i <= N; i++) { var p = base.getPointAtLength(L * i / N); S.push({ x: p.x, y: p.y }); }

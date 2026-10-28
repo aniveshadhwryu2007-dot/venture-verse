@@ -43,15 +43,24 @@ if (speakerGrid) {
   speakerGrid.appendChild(track);
 }
 
-/* Coordinator profiles: faculty lead followed by the four student organizers. */
+/* Coordinator profiles: faculty coordinators followed by the four student organizers. */
 const coordinators = {
-  faculty: {
-    name: 'Prof. Rakesh Jaiswal',
-    role: 'Faculty Coordinator',
-    image: 'assets/coordinators/rakesh_jaiswal.jpg',
-    phone: '+918989490248',
-    email: 'rakeshjaiswal@oriental.ac.in'
-  },
+  faculty: [
+    {
+      name: 'Prof. Rakesh Jaiswal',
+      role: 'Faculty Coordinator, Department of CSBS & CSE',
+      image: 'assets/coordinators/rakesh_jaiswal.jpg',
+      phone: '+918989490248',
+      email: 'rakeshjaiswal@oriental.ac.in'
+    },
+    {
+      name: 'Princy Shrivastava',
+      role: 'Faculty Coordinator',
+      image: 'assets/coordinators/princy_shrivastava.jpeg',
+      phone: '+919340546664',
+      email: ''
+    }
+  ],
   students: [
     { name: 'Swastik Pandey', role: 'Student Coordinator', image: 'assets/coordinators/swastik_pandey.jpg', phone: '+919301732087', email: 'swastikpandey2901@gmail.com' },
     { name: 'Adarsh Raghuwanshi', role: 'Student Coordinator', image: 'assets/coordinators/adarsh_raghuwanshi.jpg', phone: '+916260668775', email: 'adarshraghuwanshi10e@gmail.com' },
@@ -330,7 +339,7 @@ if (contactPage) {
   const contactWhatsAppIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20l1.2-4.6A8.5 8.5 0 1 1 20.5 11.5Z"/><path d="M8.5 8.3c.4 2.7 2.5 4.8 5.2 5.2l1.2-1.2 2 .9c.2.1.3.3.2.5-.2.8-.9 1.4-1.8 1.4-3.8-.2-7.1-3.5-7.3-7.3 0-.9.6-1.6 1.4-1.8.2-.1.4 0 .5.2l.9 2-1.3 1.1Z"/></svg>';
   const contactLinkedInIcon = '<span class="linkedin-mark" aria-hidden="true">in</span>';
 
-  function createContactProfile(person, isFaculty = false) {
+  function createContactProfile(person) {
     const card = document.createElement('article');
     card.className = 'contact-profile-card';
 
@@ -350,7 +359,7 @@ if (contactPage) {
 
     const role = document.createElement('p');
     role.className = 'contact-profile-role';
-    role.textContent = isFaculty ? 'Faculty Coordinator, Department of CSBS & CSE' : person.role;
+    role.textContent = person.role;
 
     const phoneText = document.createElement('a');
     phoneText.className = 'contact-profile-phone';
@@ -384,7 +393,9 @@ if (contactPage) {
     linkedIn.setAttribute('aria-label', 'LinkedIn profile link coming soon');
     linkedIn.title = 'LinkedIn link coming soon';
     linkedIn.innerHTML = contactLinkedInIcon;
-    actions.append(call, mail, whatsapp, linkedIn);
+    actions.append(call);
+    if (person.email) actions.append(mail);
+    actions.append(whatsapp, linkedIn);
 
     card.append(photoFrame, name, role, phoneText, actions);
     return card;
@@ -393,7 +404,7 @@ if (contactPage) {
   const facultyProfiles = document.getElementById('facultyProfiles');
   const studentProfiles = document.getElementById('studentProfiles');
   if (facultyProfiles && studentProfiles) {
-    facultyProfiles.appendChild(createContactProfile(coordinators.faculty, true));
+    coordinators.faculty.forEach(person => facultyProfiles.appendChild(createContactProfile(person)));
     coordinators.students.forEach(person => studentProfiles.appendChild(createContactProfile(person)));
   }
 
@@ -475,18 +486,107 @@ if (contactPage) {
 /* Sync the React split-flap board with the vanilla roadmap rocket progress. */
 const roadmapStage = document.getElementById('rmStage');
 if (roadmapStage) {
+  const roadmapRocket = document.getElementById('rmRocket');
+  const burstCanvas = document.getElementById('burstCanvas');
+  const burstContext = burstCanvas?.getContext('2d');
   let rocketLanded = Number(roadmapStage.dataset.rocketProgress || 0) > 0.92;
+  let landingTimer = 0;
+  let burstFrame = 0;
+  let burstParticles = [];
   window.roadmapRocketLanded = rocketLanded;
+
+  function resizeBurstCanvas() {
+    if (!burstCanvas || !burstContext) return;
+    const bounds = roadmapStage.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    burstCanvas.width = Math.max(1, Math.round(bounds.width * dpr));
+    burstCanvas.height = Math.max(1, Math.round(bounds.height * dpr));
+    burstContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function animateBurst() {
+    if (!burstCanvas || !burstContext) return;
+    const ctx = burstContext;
+    const width = burstCanvas.clientWidth;
+    const height = burstCanvas.clientHeight;
+    ctx.clearRect(0, 0, width, height);
+    burstParticles = burstParticles.filter(particle => particle.life > 0);
+    burstParticles.forEach(particle => {
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      particle.vy += 0.045;
+      particle.vx *= 0.985;
+      particle.life -= 1;
+      ctx.globalAlpha = Math.max(0, particle.life / particle.maxLife);
+      ctx.fillStyle = particle.color;
+      ctx.shadowColor = particle.color;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+    if (burstParticles.length) burstFrame = window.requestAnimationFrame(animateBurst);
+    else {
+      ctx.clearRect(0, 0, width, height);
+      burstFrame = 0;
+    }
+  }
+
+  function burstAtRocketTip() {
+    if (!roadmapRocket || !burstCanvas || !burstContext) return;
+    resizeBurstCanvas();
+    const canvasBounds = burstCanvas.getBoundingClientRect();
+    const rocketBounds = roadmapRocket.getBoundingClientRect();
+    const angle = (parseFloat(roadmapRocket.style.getPropertyValue('--rocket-angle')) || 0) * Math.PI / 180;
+    const centerX = rocketBounds.left + rocketBounds.width / 2 - canvasBounds.left;
+    const centerY = rocketBounds.top + rocketBounds.height / 2 - canvasBounds.top;
+    const x = centerX + Math.sin(angle) * 27;
+    const y = centerY - Math.cos(angle) * 27;
+    const colors = ['#fff3bf', '#f2c14e', '#ffd76a', '#d99a24'];
+    burstParticles = Array.from({ length: 34 }, () => {
+      const direction = Math.random() * Math.PI * 2;
+      const speed = 1.2 + Math.random() * 4.2;
+      const life = 24 + Math.random() * 22;
+      return {
+        x, y,
+        vx: Math.cos(direction) * speed,
+        vy: Math.sin(direction) * speed,
+        life,
+        maxLife: life,
+        size: 1 + Math.random() * 2.4,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      };
+    });
+    if (burstFrame) window.cancelAnimationFrame(burstFrame);
+    burstFrame = window.requestAnimationFrame(animateBurst);
+  }
+
+  function setRocketOpacity(opacity) {
+    if (window.gsap) window.gsap.set('.timeline-rocket', { opacity });
+    else if (roadmapRocket) roadmapRocket.style.opacity = String(opacity);
+  }
+
+  resizeBurstCanvas();
+  window.addEventListener('resize', resizeBurstCanvas, { passive: true });
 
   document.addEventListener('roadmapprogress', event => {
     const progress = Number(event.detail?.progress ?? roadmapStage.dataset.rocketProgress ?? 0);
-    if (progress > 0.92 && !rocketLanded) {
+    if (progress >= 0.935 && !rocketLanded) {
       rocketLanded = true;
       window.roadmapRocketLanded = true;
-      window.dispatchEvent(new CustomEvent('rocketLanded'));
-    } else if (progress < 0.88 && rocketLanded) {
+      window.clearTimeout(landingTimer);
+      setRocketOpacity(0);
+      burstAtRocketTip();
+      landingTimer = window.setTimeout(() => {
+        if (rocketLanded) window.dispatchEvent(new CustomEvent('rocketLanded'));
+      }, 200);
+    } else if (progress < 0.90 && rocketLanded) {
       rocketLanded = false;
       window.roadmapRocketLanded = false;
+      window.clearTimeout(landingTimer);
+      setRocketOpacity(1);
       window.dispatchEvent(new CustomEvent('rocketReset'));
     }
   });

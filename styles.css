@@ -757,6 +757,17 @@ ul { list-style: none; }
   margin-bottom: 14px;
 }
 
+.about-institution-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1600 / 639;
+  object-fit: contain;
+  margin: 0 0 24px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: 12px;
+}
+
 .about-card p {
   font-size: 1.05rem;
   color: #C2CBD8;
