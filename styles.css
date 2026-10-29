@@ -3479,3 +3479,19 @@ h4,
     z-index: 10;
   }
 }
+
+.rm-stage {
+  contain: paint;
+}
+
+.timeline-rocket,
+.rm-svg,
+#burstCanvas {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+#rmTrail {
+  will-change: stroke-dashoffset;
+}

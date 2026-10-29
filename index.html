@@ -788,7 +788,7 @@
     var words = [].slice.call(sec.querySelectorAll('.rm-word'));
     var N = 800, F = [0.14, 0.27, 0.66, 0.82];
     var STOP_PROGRESS = 0.94;
-    var A = [], W = 0, H = 0, L = 0, S = [], cur = 0, ang = 0, lastO = [], lastS = [], renderPending = false;
+    var A = [], W = 0, H = 0, L = 0, S = [], cur = 0, targetProgress = 0, ang = 0, lastO = [], lastS = [], renderPending = false, lastFrame = 0;
     var clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
     var smooth = function (a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 
@@ -829,7 +829,8 @@
         [{ y: S[Math.round(STOP_PROGRESS * N)].y, c: STOP_PROGRESS }]
       );
       lastO = []; lastS = [];
-      cur = target();
+      targetProgress = target();
+      cur = targetProgress;
       render();
     }
 
@@ -881,20 +882,32 @@
     function target() {
       var yy = window.innerHeight * 0.5 - stage.getBoundingClientRect().top;
       var startY = A[0].y;
-      var compressedY = startY + (yy - startY) / 0.68;
+      var scrollRange = window.innerWidth < 768 ? 1.02 : 0.68;
+      var compressedY = startY + (yy - startY) / scrollRange;
       if (compressedY <= startY) return 0;
       for (var i = 1; i < A.length; i++) if (compressedY <= A[i].y) { var a = A[i - 1], b = A[i]; return a.c + (b.c - a.c) * (compressedY - a.y) / (b.y - a.y); }
       return STOP_PROGRESS;
     }
 
+    function animateScroll(timestamp) {
+      renderPending = false;
+      var elapsed = lastFrame ? Math.min(timestamp - lastFrame, 64) : 16;
+      lastFrame = timestamp;
+      var easing = 1 - Math.exp(-elapsed / 180);
+      var difference = targetProgress - cur;
+      cur = Math.abs(difference) < 0.001 ? targetProgress : cur + difference * easing;
+      render();
+      if (Math.abs(targetProgress - cur) >= 0.001) {
+        renderPending = true;
+        requestAnimationFrame(animateScroll);
+      }
+    }
+
     function scheduleRender() {
+      targetProgress = target();
       if (renderPending) return;
       renderPending = true;
-      requestAnimationFrame(function () {
-        renderPending = false;
-        cur = target();
-        render();
-      });
+      requestAnimationFrame(animateScroll);
     }
     window.addEventListener('scroll', scheduleRender, { passive: true });
 
