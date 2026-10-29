@@ -3495,3 +3495,24 @@ h4,
 #rmTrail {
   will-change: stroke-dashoffset;
 }
+
+@media (max-width: 768px) {
+  .roadmap-svg,
+  #roadmap-path,
+  .rm-svg,
+  #rmBase,
+  #rmTrail,
+  .timeline-rocket {
+    filter: none !important;
+  }
+
+  #roadmap-path,
+  #rmTrail {
+    stroke: #d4af37 !important;
+  }
+
+  .timeline-rocket {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+  }
+}

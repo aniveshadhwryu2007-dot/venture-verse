@@ -882,7 +882,7 @@
     function target() {
       var yy = window.innerHeight * 0.5 - stage.getBoundingClientRect().top;
       var startY = A[0].y;
-      var scrollRange = window.innerWidth < 768 ? 1.02 : 0.68;
+      var scrollRange = (window.innerHeight * 2) / (A[A.length - 1].y - startY);
       var compressedY = startY + (yy - startY) / scrollRange;
       if (compressedY <= startY) return 0;
       for (var i = 1; i < A.length; i++) if (compressedY <= A[i].y) { var a = A[i - 1], b = A[i]; return a.c + (b.c - a.c) * (compressedY - a.y) / (b.y - a.y); }
@@ -893,7 +893,7 @@
       renderPending = false;
       var elapsed = lastFrame ? Math.min(timestamp - lastFrame, 64) : 16;
       lastFrame = timestamp;
-      var easing = 1 - Math.exp(-elapsed / 180);
+      var easing = 1 - Math.exp(-elapsed / 130);
       var difference = targetProgress - cur;
       cur = Math.abs(difference) < 0.001 ? targetProgress : cur + difference * easing;
       render();
