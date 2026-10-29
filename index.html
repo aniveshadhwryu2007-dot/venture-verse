@@ -788,13 +788,13 @@
     var words = [].slice.call(sec.querySelectorAll('.rm-word'));
     var N = 800, F = [0.14, 0.27, 0.66, 0.82];
     var STOP_PROGRESS = 0.94;
-    var A = [], W = 0, H = 0, L = 0, S = [], cur = 0, targetProgress = 0, ang = 0, lastO = [], lastS = [], renderPending = false, lastFrame = 0;
+    var A = [], W = 0, H = 0, L = 0, S = [], cur = 0, ang = 0, lastO = [], lastS = [];
     var clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
     var smooth = function (a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 
     function build() {
       W = stage.clientWidth; if (!W) return;
-      H = Math.round(clamp(W * 1.45, 1500, 1900));
+      H = Math.max(1, stage.clientHeight);
       stage.style.height = H + 'px';
       svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
       var cx = W / 2, amp = Math.min(W * 0.28, 300), r = Math.min(W * 0.16, 105), yT = H * 0.4, f = function (n) { return H * n; };
@@ -829,8 +829,7 @@
         [{ y: S[Math.round(STOP_PROGRESS * N)].y, c: STOP_PROGRESS }]
       );
       lastO = []; lastS = [];
-      targetProgress = target();
-      cur = targetProgress;
+      cur = clamp(cur, 0, STOP_PROGRESS);
       render();
     }
 
@@ -867,10 +866,9 @@
       rocket.style.transform = 'translate3d(' + p.x.toFixed(1) + 'px,' + p.y.toFixed(1) + 'px,0) rotate(' + ang.toFixed(1) + 'deg) translateZ(0)';
       trail.style.strokeDashoffset = (L * (1 - cur)).toFixed(1);
       stage.dataset.rocketProgress = cur.toFixed(4);
-      var top = stage.getBoundingClientRect().top, vh = window.innerHeight;
       words.forEach(function (w, k) {
-        /* Highlight peaks when the word sits at the vertical centre of the screen */
-        var d = (top + w._y - vh / 2) / vh, below = d > 0, ad = Math.abs(d), floor = below ? 0.12 : 0.35;
+        /* Highlight each event as the pinned rocket reaches its roadmap marker. */
+        var d = (cur - F[k]) * (2 / STOP_PROGRESS), below = d > 0, ad = Math.abs(d), floor = below ? 0.12 : 0.35;
         var a = 1 - smooth(0, below ? 0.3 : 0.25, ad), bump = Math.max(0, 1 - ad / 0.12);
         var o = +(floor + (1 - floor) * a).toFixed(3), s = +(0.9 + 0.1 * a + 0.1 * bump * bump).toFixed(3);
         if (o !== lastO[k]) { w.style.setProperty('--o', o); lastO[k] = o; }
@@ -879,41 +877,23 @@
       document.dispatchEvent(new CustomEvent('roadmapprogress', { detail: { progress: cur } }));
     }
 
-    function target() {
-      var yy = window.innerHeight * 0.5 - stage.getBoundingClientRect().top;
-      var startY = A[0].y;
-      var scrollRange = (window.innerHeight * 2) / (A[A.length - 1].y - startY);
-      var compressedY = startY + (yy - startY) / scrollRange;
-      if (compressedY <= startY) return 0;
-      for (var i = 1; i < A.length; i++) if (compressedY <= A[i].y) { var a = A[i - 1], b = A[i]; return a.c + (b.c - a.c) * (compressedY - a.y) / (b.y - a.y); }
-      return STOP_PROGRESS;
-    }
-
-    function animateScroll(timestamp) {
-      renderPending = false;
-      var elapsed = lastFrame ? Math.min(timestamp - lastFrame, 64) : 16;
-      lastFrame = timestamp;
-      var easing = 1 - Math.exp(-elapsed / 130);
-      var difference = targetProgress - cur;
-      cur = Math.abs(difference) < 0.001 ? targetProgress : cur + difference * easing;
+    window.setRoadmapProgress = function (progress) {
+      cur = clamp(progress, 0, STOP_PROGRESS);
       render();
-      if (Math.abs(targetProgress - cur) >= 0.001) {
-        renderPending = true;
-        requestAnimationFrame(animateScroll);
-      }
-    }
+    };
 
-    function scheduleRender() {
-      targetProgress = target();
-      if (renderPending) return;
-      renderPending = true;
-      requestAnimationFrame(animateScroll);
-    }
-    window.addEventListener('scroll', scheduleRender, { passive: true });
-
-    var rz; window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(build, 150); });
+    var rz; window.addEventListener('resize', function () {
+      clearTimeout(rz);
+      rz = setTimeout(function () {
+        build();
+        window.dispatchEvent(new Event('roadmaplayoutchange'));
+      }, 150);
+    });
     build();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(build);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () {
+      build();
+      window.dispatchEvent(new Event('roadmaplayoutchange'));
+    });
   })();
   </script>
 
@@ -1369,6 +1349,8 @@ const SplitFlapText = ({
     const flapRootElement = document.getElementById('react-flap-root');
     if (flapRootElement) ReactDOM.createRoot(flapRootElement).render(<FlapController />);
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
   <script src="script.js"></script>
 
 </body>

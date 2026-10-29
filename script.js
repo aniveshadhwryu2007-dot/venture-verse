@@ -592,6 +592,35 @@ if (roadmapStage) {
   });
 }
 
+/* Pin the roadmap while the rocket and SVG trail follow one scroll-scrubbed timeline. */
+const roadmapSection = document.getElementById('roadmap');
+if (roadmapSection && window.gsap && window.ScrollTrigger && typeof window.setRoadmapProgress === 'function') {
+  window.gsap.registerPlugin(window.ScrollTrigger);
+  const roadmapProgress = { value: Number(roadmapStage?.dataset.rocketProgress || 0) };
+  const rocketTimeline = window.gsap.timeline({ paused: true });
+  rocketTimeline.fromTo(roadmapProgress, { value: 0 }, {
+    value: 0.94,
+    duration: 1,
+    ease: 'none',
+    onUpdate: () => window.setRoadmapProgress(roadmapProgress.value)
+  });
+
+  window.ScrollTrigger.create({
+    trigger: '#roadmap',
+    start: 'top top',
+    end: '+=2200',
+    pin: true,
+    scrub: 0.8,
+    anticipatePin: 1,
+    animation: rocketTimeline,
+    invalidateOnRefresh: true,
+    fastScrollEnd: true,
+    preventOverlaps: true
+  });
+
+  window.addEventListener('roadmaplayoutchange', () => window.ScrollTrigger.refresh(), { passive: true });
+}
+
 /* Scroll-linked liquid reveal for the footer wordmark; reaching page bottom fills it fully. */
 const fluidFinale = document.querySelector('.fluid-brand-finale');
 const fluidFillMask = fluidFinale?.querySelector('.fluid-fill-mask');
